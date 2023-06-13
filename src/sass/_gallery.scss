@@ -21,6 +21,7 @@ p {
     padding-right: auto;
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 20px;
 }
 
@@ -108,3 +109,51 @@ form {
     cursor: zoom-in;
 }
 
+
+
+.is-hidden {
+    position: absolute;
+
+    margin: -1px;
+    padding: 0;
+    width: 1px;
+    height: 1px;
+
+    border: 0;
+
+    white-space: nowrap;
+    clip-path: inset(100%);
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+}
+
+.to-top {
+    position: fixed;
+    bottom: 5%;
+    right: 5%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 70px;
+    height: 70px;
+
+    text-decoration: none;
+    color: #fff;
+    background-color: #A3D0C3;
+    border-radius: 50%;
+    opacity: 0.6;
+    box-shadow: 2px 1px 3px 0px rgba(0, 0, 0, 0.3);
+
+    cursor: pointer;
+    animation: drag 2000ms ease-in-out infinite;
+
+    transition: all 350ms ease-in-out;
+
+    &:hover,
+    &:focus {
+        opacity: 1;
+        animation-play-state: paused;
+    }
+}

@@ -4,11 +4,16 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
 const searchApiResults = new SearchApiResults();
+let gallery = new SimpleLightbox('.gallery a');
+
+
 const refs = {
     form: document.querySelector(".search-form"),
-    gallery: document.querySelector('.gallery')
+    gallery: document.querySelector('.gallery'),
+    toTopBtn: document.querySelector('.to-top'),
 }
 
+refs.toTopBtn.addEventListener('click', onTopScroll);
 refs.form.addEventListener("submit", onSubmit)
 
 async function onSubmit(e) {
@@ -25,21 +30,19 @@ async function onSubmit(e) {
 
     searchApiResults.setSearchValue(inputValue);
     searchApiResults.resetPage();
-    showResulst()
+   showResulst()
     window.addEventListener("scroll", handleScroll) 
     
-
+   
 }
 async function showResulst() {
-
     try {
         const markup = await generateHitsMarkup();
-       
         if (markup === undefined) {
-            // Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
             throw new Error("No data!");
         }
         appendResultsToList(markup) 
+        gallery.refresh()
     } catch(err) {
         onError()
     }
@@ -74,24 +77,38 @@ async function generateHitsMarkup() {
 }
 
 function createMarkup({ likes, views, comments, downloads, webformatURL, largeImageURL, tags }) {
-    return `<a class="gallery__link" href="${largeImageURL}}"><div class="photo-card">
-  <img class="results-img" src="${webformatURL}" alt="${tags}" loading="lazy"/>
-  <div class="info">
-    <p class="info-item">
-      <b>Likes</b> ${likes}
-    </p>
-    <p class="info-item">
-      <b>Views</b> ${views}
-    </p>
-    <p class="info-item">
-      <b>Comments</b> ${comments}
-    </p>
-    <p class="info-item">
-      <b>Downloads</b> ${downloads}
-    </p>
-  </div>
-</div></a>`
-
+    return `
+    <div class="photo-card">
+      <a href="${webformatURL}">
+        <img
+          class="results-img"
+          src="${largeImageURL}" 
+          alt="${tags}" 
+          loading="lazy" 
+          width="320"
+          height="212"
+        />
+      </a>
+      <div class="info">
+        <p class="info-item">
+          <b>Likes</b>
+          <span>${likes}</span>
+        </p>
+        <p class="info-item">
+          <b>Views</b>
+          <span>${views}</span>
+        </p>
+        <p class="info-item">
+          <b>Comments</b>
+          <span>${comments}</span>
+        </p>
+        <p class="info-item">
+          <b>Downloads</b>
+          <span>${downloads}</span>
+        </p>
+      </div>
+    </div>
+    `
 }
 
 function appendResultsToList(markup) {
@@ -108,8 +125,26 @@ function onError(err) {
 }
 
 function handleScroll() {
+      const offsetTrigger = 100;
+  const pageOffset = window.pageYOffset;
+
+  pageOffset > offsetTrigger
+    ? refs.toTopBtn.classList.remove('is-hidden')
+    : refs.toTopBtn.classList.add('is-hidden');
+
+
+
+    
     const { clientHeight, scrollTop, scrollHeight } = document.documentElement;
     if (scrollTop + clientHeight >= scrollHeight - 10) {
         showResulst()
+        
     }
+}
+
+function onTopScroll() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
 }
