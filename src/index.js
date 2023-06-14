@@ -1,5 +1,6 @@
 import Notiflix from "notiflix";
 import SearchApiResults from "./js/api"; 
+import { throttle } from "lodash";
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
@@ -19,7 +20,7 @@ refs.form.addEventListener("submit", onSubmit)
 async function onSubmit(e) {
     e.preventDefault()
     const inputValue = refs.form.elements.searchQuery.value.trim();
-    
+     window.addEventListener("scroll", throttleScroll) 
     if (inputValue === "") {
         clearGallery()
         Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
@@ -31,7 +32,7 @@ async function onSubmit(e) {
     searchApiResults.setSearchValue(inputValue);
     searchApiResults.resetPage();
    showResulst()
-    window.addEventListener("scroll", handleScroll) 
+    
     
    
 }
@@ -41,7 +42,7 @@ async function showResulst() {
         if (markup === undefined) {
             throw new Error("No data!");
         }
-        appendResultsToList(markup) 
+       await appendResultsToList(markup) 
         gallery.refresh()
     } catch(err) {
         onError()
@@ -54,12 +55,12 @@ async function generateHitsMarkup() {
         const { hits, totalHits } = await searchApiResults.getResults()
         const newPage = searchApiResults.page;
         const maxPage = Math.ceil(totalHits / 40)
-        if (newPage === 2 && totalHits > 0) {
+        if (totalHits > 0) {
              Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`)
         }
         if (newPage > maxPage && totalHits > 0) {
         Notiflix.Notify.failure(`'We're sorry, but you've reached the end of search results'`);
-            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener("scroll", throttleScroll);
         }
 
 
@@ -113,6 +114,7 @@ function createMarkup({ likes, views, comments, downloads, webformatURL, largeIm
 
 function appendResultsToList(markup) {
     refs.gallery.insertAdjacentHTML("beforeend", markup);
+   
 }
 
 function clearGallery() {
@@ -124,7 +126,10 @@ function onError(err) {
     clearGallery();
 }
 
-async function handleScroll() {
+const throttleScroll = throttle(handleScroll, 500)
+
+ function handleScroll() {
+    
       const offsetTrigger = 100;
   const pageOffset = window.pageYOffset;
 
@@ -132,15 +137,11 @@ async function handleScroll() {
     ? refs.toTopBtn.classList.remove('is-hidden')
     : refs.toTopBtn.classList.add('is-hidden');
 
-
-
-    
     const { clientHeight, scrollTop, scrollHeight } = document.documentElement;
     if (scrollTop + clientHeight >= scrollHeight - 10) {
         
-    await showResulst() 
-       
-        
+     showResulst() 
+    
     }
 }
 
