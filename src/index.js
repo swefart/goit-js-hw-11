@@ -57,7 +57,7 @@ async function generateHitsMarkup() {
         if (newPage === 2 && totalHits > 0) {
              Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`)
         }
-        if (newPage >= maxPage && totalHits > 0) {
+        if (newPage > maxPage && totalHits > 0) {
         Notiflix.Notify.failure(`'We're sorry, but you've reached the end of search results'`);
             window.removeEventListener('scroll', handleScroll);
         }
@@ -124,7 +124,7 @@ function onError(err) {
     clearGallery();
 }
 
-function handleScroll() {
+async function handleScroll() {
       const offsetTrigger = 100;
   const pageOffset = window.pageYOffset;
 
@@ -137,7 +137,9 @@ function handleScroll() {
     
     const { clientHeight, scrollTop, scrollHeight } = document.documentElement;
     if (scrollTop + clientHeight >= scrollHeight - 10) {
-        showResulst()
+        
+    await showResulst() 
+       
         
     }
 }
