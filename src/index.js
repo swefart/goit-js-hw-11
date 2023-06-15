@@ -6,7 +6,7 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 
 const searchApiResults = new SearchApiResults();
 let gallery = new SimpleLightbox('.gallery a');
-
+const throttleScroll = throttle(handleScroll, 500)
 
 const refs = {
     form: document.querySelector(".search-form"),
@@ -55,7 +55,7 @@ async function generateHitsMarkup() {
         const { hits, totalHits } = await searchApiResults.getResults()
         const newPage = searchApiResults.page;
         const maxPage = Math.ceil(totalHits / 40)
-        if (totalHits > 0) {
+        if (newPage === 2 && totalHits > 0) {
              Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`)
         }
         if (newPage > maxPage && totalHits > 0) {
@@ -125,8 +125,6 @@ function onError(err) {
     
     clearGallery();
 }
-
-const throttleScroll = throttle(handleScroll, 500)
 
  function handleScroll() {
     
